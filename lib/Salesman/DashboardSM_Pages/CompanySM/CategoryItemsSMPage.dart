@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Admin/AllAPIs/API.dart';
 import '../../../Models/CompanyCategoryModel.dart';
@@ -32,6 +31,7 @@ class _CategoryItemsSMScreenState extends State<CategoryItemsSMScreen> {
   List<ItemsModel> searchlistModel = [];
   TextEditingController searchController = TextEditingController();
   int quantity = 0;
+  bool showStockOnly = false;
 
   @override
   void initState() {
@@ -51,25 +51,41 @@ class _CategoryItemsSMScreenState extends State<CategoryItemsSMScreen> {
         children: [
           Padding(
             padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-            child: TextFormField(
-              controller: searchController,
-              onChanged: (action) => searchFunction(action),
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.search, size: 35),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    searchController.clear();
-                    searchlistModel.clear();
-                    searchlistModel = companyCategoryModel;
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: searchController,
+                    onChanged: (action) => searchFunction(action),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search, size: 35),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          searchController.clear();
+                          searchlistModel.clear();
+                          searchlistModel = companyCategoryModel;
+                        },
+                        icon: Icon(Icons.cancel),
+                      ),
+                      hintText: 'Search',
+                      labelText: 'Search',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 5),
+                Text('In-Stock'),
+                Checkbox(
+                  value: showStockOnly,
+                  onChanged: (value) {
+                    setState(() {
+                      showStockOnly = value ?? false;
+                    });
                   },
-                  icon: Icon(Icons.cancel),
                 ),
-                hintText: 'Search',
-                labelText: 'Search',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              ],
             ),
           ),
           Expanded(
@@ -80,8 +96,16 @@ class _CategoryItemsSMScreenState extends State<CategoryItemsSMScreen> {
                   return Center(child: CircularProgressIndicator());
                 } else {
                   return ListView.builder(
-                    itemCount: searchlistModel.length,
+                    itemCount: showStockOnly
+                        ? searchlistModel
+                        .where((item) => double.parse(item.titmqnt!) != 0)
+                        .length
+                        : searchlistModel.length,
                     itemBuilder: (context, index) {
+                      if (showStockOnly &&
+                          double.parse(searchlistModel[index].titmqnt!) == 0) {
+                        return Container(); // Skip rendering items with stock value below or equal to 0
+                      }
                       return Padding(
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Card(
@@ -100,260 +124,216 @@ class _CategoryItemsSMScreenState extends State<CategoryItemsSMScreen> {
                             ),
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(
-                                    left: 8, right: 8, bottom: 5),
+                                padding:
+                                EdgeInsets.only(left: 8, right: 8, bottom: 5),
                                 child: Column(
                                   children: [
                                     Table(
                                       columnWidths: {
                                         0: FlexColumnWidth(1),
-                                        1: FlexColumnWidth(1.3),
+                                        1: FlexColumnWidth(1),
                                       },
                                       children: [
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "SM Rate:",
-                                                style: TextStyle(
+                                        TableRow(children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "SM Rate:",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].tmanrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "MRP:",
+                                              style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                                  color: Colors.red),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .tmanrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].trtlrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 16),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "MRP:",
-                                                style: TextStyle(
+                                          ),
+                                        ]),
+                                        TableRow(children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Hlf Rate:",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].thlfrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Fix Rate:",
+                                              style: TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
+                                                  color: Colors.red),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .trtlrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].tfixrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 15),
                                             ),
-                                          ],
-                                        ),
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Hlf Rate:",
-                                                style: TextStyle(
+                                          )
+                                        ]),
+                                        TableRow(children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Sale Rate:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .thlfrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].tsalrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 16),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Fix Rate:",
-                                                style: TextStyle(
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Lock Rate:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.red,
-                                                ),
-                                              ),
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .tfixrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 15),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              f.format(double.parse(
+                                                searchlistModel[index].tlckrat ??
+                                                    "0",
+                                              )),
+                                              style: TextStyle(fontSize: 16),
                                             ),
-                                          ],
-                                        ),
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Sale Rate:",
-                                                style: TextStyle(
+                                          )
+                                        ]),
+                                        TableRow(children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "last Rate:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              searchlistModel[index].tlstdat
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontSize: 15,
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .tsalrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Lock Rate:",
-                                                style: TextStyle(
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Last Time:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                f.format(double.parse(
-                                                    searchlistModel[index]
-                                                        .tlckrat ??
-                                                        "0")),
-                                                style: TextStyle(fontSize: 16),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              searchlistModel[index].tlsttim
+                                                  .toString(),
+                                              style: TextStyle(fontSize: 15),
                                             ),
-                                          ],
-                                        ),
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "last Rate:",
-                                                style: TextStyle(
+                                          )
+                                        ]),
+                                        TableRow(children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Stock:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              searchlistModel[index].titmqnt
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontSize: 15,
                                               ),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                searchlistModel[index]
-                                                    .tlstdat
-                                                    .toString(),
-                                                style: TextStyle(
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              "Comm:",
+                                              style: TextStyle(
                                                   fontSize: 15,
-                                                ),
-                                              ),
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Last Time:",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              searchlistModel[index].tcomamt ??
+                                                  '0',
+                                              style: TextStyle(fontSize: 15),
                                             ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                searchlistModel[index]
-                                                    .tlsttim
-                                                    .toString(),
-                                                style: TextStyle(fontSize: 15),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        TableRow(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Stock:",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                searchlistModel[index]
-                                                    .titmqnt
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                "Comm:",
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                              EdgeInsets.only(top: 5.0),
-                                              child: Text(
-                                                searchlistModel[index]
-                                                    .tcomamt ??
-                                                    '0',
-                                                style: TextStyle(fontSize: 15),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          )
+                                        ]),
                                       ],
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),

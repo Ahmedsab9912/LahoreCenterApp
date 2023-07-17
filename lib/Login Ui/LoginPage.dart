@@ -33,12 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Center(
                 child: Image(
-                    // height: 250,
-                    width: 280,
-                    image: AssetImage('images/UsamaLogo.png')),
+                    height: 100,
+                    width: 350,
+                    image: AssetImage('images/lahoreCenterLogo.png')),
               ),
-              SizedBox(height: 10,),
-              Text('USAMA ELECTRONICS',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold)),
               SizedBox(height:40,),
               Padding(
                 padding: EdgeInsets.only(left: 0, right: 0),

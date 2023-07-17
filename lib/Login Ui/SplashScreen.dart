@@ -32,8 +32,8 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Padding(
               padding: EdgeInsets.only(top: 200),
               child: Image(
-                  height: 330,
-                  width: 330,
+                  height: 360,
+                  width: 360,
                   image: AssetImage('images/lahoreCenterLogo.png')),
             ),
           ),

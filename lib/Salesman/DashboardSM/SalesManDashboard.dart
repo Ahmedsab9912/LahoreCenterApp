@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../AddToCartPage/CartPage.dart';
+import '../../SupportPage/SupportScreen.dart';
 import '../DashboardSM_Pages/CategorySM/CategorySMPage.dart';
 import '../DashboardSM_Pages/CompanySM/CompanySMPage.dart';
 import '../DashboardSM_Pages/Rate UpdateSM/RateUpdateSMPage.dart';
@@ -114,7 +113,7 @@ class _SalesManDashboardPageState extends State<SalesManDashboardPage> {
               ],
             ),
           ),
-          Padding(
+            Padding(
             padding: EdgeInsets.only(left: 30, right: 30, top: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -198,6 +197,41 @@ class _SalesManDashboardPageState extends State<SalesManDashboardPage> {
               ],
             ),
           ),
+            Padding(
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context){
+                      return  SupportPage();
+                    }));
+                  },
+                    child: Card(
+                      elevation: 10,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 15,top: 15),
+                        child: Container(
+                          height: _height * .17,
+                          width: _width * .37,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children:  [
+                              Image(width: 90,
+                                  height: 60,
+                                  image: AssetImage('images/support.png')),
+                              SizedBox(height: 15,),
+                              Text('Support',style: TextStyle(fontSize: _height * .019,color: Colors.red[600]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

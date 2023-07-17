@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../SupportPage/SupportScreen.dart';
 import '../Dashboard_Pages/Category/CategoryPage.dart';
 import '../Dashboard_Pages/Company/CompanyPage.dart';
 import '../Dashboard_Pages/Rate Update/RateUpdatePage.dart';
@@ -184,6 +185,33 @@ class _DashboardPageState extends State<DashboardPage> {
                                 image: AssetImage('images/user.png')),
                             SizedBox(height: 15,),
                             Text('Users',style: TextStyle(fontSize: _hight * .019,color: Colors.red[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                InkWell(onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context){
+                    return  SupportPage();
+                  }));
+                },
+                  child: Card(
+                    elevation: 10,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 15,top: 15),
+                      child: Container(
+                        height: _hight * .17,
+                        width: _width * .37,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:  [
+                            Image(width: 90,
+                                height: 60,
+                                image: AssetImage('images/support.png')),
+                            SizedBox(height: 15,),
+                            Text('Support',style: TextStyle(fontSize: _hight * .019,color: Colors.red[600]),
                             ),
                           ],
                         ),

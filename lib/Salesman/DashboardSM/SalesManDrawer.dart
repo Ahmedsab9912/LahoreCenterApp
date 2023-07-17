@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Login Ui/LoginPage.dart';
+import '../../SupportPage/SupportScreen.dart';
 import '../DashboardSM_Pages/CategorySM/CategorySMPage.dart';
 import '../DashboardSM_Pages/CompanySM/CompanySMPage.dart';
 import '../DashboardSM_Pages/Rate UpdateSM/RateUpdateSMPage.dart';
@@ -45,10 +46,10 @@ class _SMDrawerState extends State<SMDrawer> {
                   children: [
                     Container(
                       height: 120,
-                      width: 170,
+                      width: 200,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('images/UsamaLogo.png'),
+                          image: AssetImage('images/lahoreCenterLogo.png'),
                         ),
                       ),
                     ),
@@ -118,6 +119,20 @@ class _SMDrawerState extends State<SMDrawer> {
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => RateUpdateSMScreen()));
+            },
+          ),
+          ListTile(
+            leading: Icon(size: 30, color: Colors.red[900], Icons.support_agent),
+            title: Text(
+              'Support',
+              style: TextStyle(fontSize: 18),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => SupportPage()));
             },
           ),
           ListTile(

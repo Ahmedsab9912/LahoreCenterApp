@@ -1,4 +1,4 @@
-String baseUrl = 'https://www.crystalsolutions.com.pk/usama';
+String baseUrl = 'https://www.crystalsolutions.com.pk/lc';
 
 //LOGIN  API
 String login = '$baseUrl/login.php';

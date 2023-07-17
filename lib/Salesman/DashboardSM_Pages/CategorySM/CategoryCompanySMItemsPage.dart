@@ -34,6 +34,7 @@ class _CategoryCompanyItemsSMScreenState
   List<ItemsModel> searchlistModel = [];
   TextEditingController search_Controller = TextEditingController();
   int quantity = 0;
+  bool showStockOnly = false;
 
   @override
   void initState() {
@@ -53,25 +54,41 @@ class _CategoryCompanyItemsSMScreenState
         children: [
           Padding(
             padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-            child: TextFormField(
-              controller: search_Controller,
-              onChanged: (action) => searchfuntion(action),
-              decoration: InputDecoration(
-                prefixIcon: Icon(size: 35, Icons.search),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    search_Controller.clear();
-                    searchlistModel.clear();
-                    searchlistModel = companyCategoryModel;
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: search_Controller,
+                    onChanged: (action) => searchfuntion(action),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search, size: 35),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          search_Controller.clear();
+                          searchlistModel.clear();
+                          searchlistModel = companyCategoryModel;
+                        },
+                        icon: Icon(Icons.cancel),
+                      ),
+                      hintText: 'Search',
+                      labelText: 'Search',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width:5),
+                Text('In-Stock'),
+                Checkbox(
+                  value: showStockOnly,
+                  onChanged: (value) {
+                    setState(() {
+                      showStockOnly = value ?? false;
+                    });
                   },
-                  icon: Icon(Icons.cancel),
                 ),
-                hintText: 'Search',
-                labelText: 'Search',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              ],
             ),
           ),
           Expanded(
@@ -82,8 +99,16 @@ class _CategoryCompanyItemsSMScreenState
                   return Center(child: CircularProgressIndicator());
                 } else {
                   return ListView.builder(
-                    itemCount: searchlistModel.length,
+                    itemCount: showStockOnly
+                        ? searchlistModel
+                        .where((item) => double.parse(item.titmqnt!) != 0)
+                        .length
+                        : searchlistModel.length,
                     itemBuilder: (context, index) {
+                      if (showStockOnly &&
+                          double.parse(searchlistModel[index].titmqnt!) == 0) {
+                        return Container(); // Skip rendering items with stock value below or equal to 0
+                      }
                       return Padding(
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Card(
@@ -102,8 +127,8 @@ class _CategoryCompanyItemsSMScreenState
                             ),
                             children: [
                               Padding(
-                                padding: EdgeInsets.only(
-                                    left: 8, right: 8, bottom: 5),
+                                padding:
+                                EdgeInsets.only(left: 8, right: 8, bottom: 5),
                                 child: Column(
                                   children: [
                                     Table(
@@ -118,17 +143,15 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "SM Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .tmanrat ??
+                                                searchlistModel[index].tmanrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 16),
@@ -139,18 +162,16 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "MRP:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .trtlrat ??
+                                                searchlistModel[index].trtlrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 16),
@@ -163,17 +184,15 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Hlf Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .thlfrat ??
+                                                searchlistModel[index].thlfrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 16),
@@ -184,18 +203,16 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Fix Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.red),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .tfixrat ??
+                                                searchlistModel[index].tfixrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 15),
@@ -208,17 +225,15 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Sale Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .tsalrat ??
+                                                searchlistModel[index].tsalrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 16),
@@ -229,17 +244,15 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Lock Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
                                               f.format(double.parse(
-                                                searchlistModel[index]
-                                                    .tlckrat ??
+                                                searchlistModel[index].tlckrat ??
                                                     "0",
                                               )),
                                               style: TextStyle(fontSize: 16),
@@ -252,16 +265,14 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "last Rate:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
-                                              searchlistModel[index]
-                                                  .tlstdat
+                                              searchlistModel[index].tlstdat
                                                   .toString(),
                                               style: TextStyle(
                                                 fontSize: 15,
@@ -273,16 +284,14 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Last Time:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
-                                              searchlistModel[index]
-                                                  .tlsttim
+                                              searchlistModel[index].tlsttim
                                                   .toString(),
                                               style: TextStyle(fontSize: 15),
                                             ),
@@ -294,16 +303,14 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Stock:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
-                                              searchlistModel[index]
-                                                  .titmqnt
+                                              searchlistModel[index].titmqnt
                                                   .toString(),
                                               style: TextStyle(
                                                 fontSize: 15,
@@ -315,23 +322,21 @@ class _CategoryCompanyItemsSMScreenState
                                             child: Text(
                                               "Comm:",
                                               style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(top: 5.0),
                                             child: Text(
-                                              searchlistModel[index]
-                                                  .tcomamt ??
+                                              searchlistModel[index].tcomamt ??
                                                   '0',
                                               style: TextStyle(fontSize: 15),
                                             ),
                                           )
                                         ]),
                                       ],
-                                    ),
+                                    )
                                   ],
                                 ),
                               ),

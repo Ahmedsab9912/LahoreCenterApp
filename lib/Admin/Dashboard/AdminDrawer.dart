@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Login Ui/LoginPage.dart';
+import '../../SupportPage/SupportScreen.dart';
 import '../Dashboard_Pages/Category/CategoryPage.dart';
 import '../Dashboard_Pages/Company/CompanyPage.dart';
 import '../Dashboard_Pages/Rate Update/RateUpdatePage.dart';
@@ -46,10 +47,10 @@ class _MyDrawerState extends State<MyDrawer> {
                   children: [
                     Container(
                       height: 120,
-                      width: 120,
+                      width:200,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('images/UsamaLogo.png'),
+                          image: AssetImage('images/lahoreCenterLogo.png'),
                         ),
                       ),
                     ),
@@ -133,6 +134,20 @@ class _MyDrawerState extends State<MyDrawer> {
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => UserMangmentScreen()));
+            },
+          ),
+          ListTile(
+            leading: Icon(size: 30, color: Colors.red[900], Icons.support_agent),
+            title: Text(
+              'Support',
+              style: TextStyle(fontSize: 18),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => SupportPage()));
             },
           ),
           ListTile(
